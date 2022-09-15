@@ -9,7 +9,6 @@ export default abstract class MongoController<T> implements IController {
   }
 
   async create(req: Request, res: Response): Promise<Response> {
-    console.log(req.body);
     const item = await this._service.create(req.body);
     return res.status(201).json(item);
   }
@@ -20,17 +19,20 @@ export default abstract class MongoController<T> implements IController {
   }
 
   async readOne(req: Request, res: Response): Promise<Response> {
-    const item = await this._service.readOne(req.params._id);
+    const item = await this._service.readOne(req.params.id);
     return res.status(200).json(item);
   }
 
   async update(req: Request, res: Response): Promise<Response> {
-    const item = await this._service.update(req.params._id, req.body);
+    console.log(req.body);
+    const item = await this._service.update(req.params.id, req.body);
+    console.log(item);
+    
     return res.status(200).json(item);
   }
 
   async delete(req: Request, res: Response): Promise<Response> {
-    const item = await this._service.readOne(req.params._id);
-    return res.status(200).json(item);
+    const item = await this._service.readOne(req.params.id);
+    return res.status(204).json(item);
   }
 }
