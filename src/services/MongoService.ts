@@ -27,8 +27,22 @@ export default abstract class MongoService<T> implements IService<T> {
     return this._model.read();
   }
 
-  readOne(_id: string): Promise<T | null> {
-    return this._model.readOne(_id);
+  async readOne(_id: string): Promise<T | null> {
+    if (_id.length < 24) {
+      const erro: ErrorInterface = new Error('Id must have 24 hexadecimal characters');
+      erro.error = 'Id must have 24 hexadecimal characters';
+      erro.status = 400;
+      throw erro;
+    }
+    const items = await this._model.readOne(_id);
+    
+    if (!items) {
+      const erro: ErrorInterface = new Error('Object not found');
+      erro.error = 'Object not found';
+      erro.status = 404;
+      throw erro;
+    }
+    return items;
   }
 
   update(_id: string, obj: T): Promise<T | null> {

@@ -3,6 +3,7 @@ import ErrorInterface from '../interfaces/IError';
 
 export default class TakingError {
   takeError = (err: ErrorInterface, _req: Request, res: Response, _next: NextFunction) => {
+    if (err.status && err.error) return res.status(err.status).json({ error: err.error });
     if (err.status) return res.status(err.status).json({ message: err.message });
 
     console.log(err);
