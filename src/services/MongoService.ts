@@ -3,6 +3,9 @@ import ErrorInterface from '../interfaces/IError';
 import { IModel } from '../interfaces/IModel';
 import IService from '../interfaces/IService';
 
+const idError = 'Id must have 24 hexadecimal characters';
+const rtrnError = 'Object not found';
+
 export default abstract class MongoService<T> implements IService<T> {
   protected _model:IModel<T>;
   protected _schema: ZodSchema<T>;
@@ -29,24 +32,44 @@ export default abstract class MongoService<T> implements IService<T> {
 
   async readOne(_id: string): Promise<T | null> {
     if (_id.length < 24) {
-      const erro: ErrorInterface = new Error('Id must have 24 hexadecimal characters');
-      erro.error = 'Id must have 24 hexadecimal characters';
+      const erro: ErrorInterface = new Error(idError);
+      erro.error = idError;
       erro.status = 400;
       throw erro;
     }
     const items = await this._model.readOne(_id);
     
     if (!items) {
-      const erro: ErrorInterface = new Error('Object not found');
-      erro.error = 'Object not found';
+      const erro: ErrorInterface = new Error(rtrnError);
+      erro.error = rtrnError;
       erro.status = 404;
       throw erro;
     }
     return items;
   }
 
-  update(_id: string, obj: T): Promise<T | null> {
-    return this._model.update(_id, obj);
+  async update(_id: string, obj: T): Promise<T | null> {
+    if (_id.length < 24) {
+      const erro: ErrorInterface = new Error(idError);
+      erro.error = idError;
+      erro.status = 400;
+      throw erro;
+    } else if (!this._schema.safeParse(obj).success) {
+      const erro: ErrorInterface = new Error(idError);
+      erro.status = 400;
+      throw erro;
+    }
+
+    const item = await this._model.update(_id, obj);
+
+    if (!this._schema.safeParse(item).success) {
+      const erro: ErrorInterface = new Error(rtrnError);
+      erro.error = rtrnError;
+      erro.status = 404;
+      throw erro;
+    }
+
+    return item;
   }
 
   delete(_id: string): Promise<T | null> {
