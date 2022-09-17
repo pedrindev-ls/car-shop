@@ -7,6 +7,15 @@ export const modelCarMock = {
   doorsQty: 2
 }
 
+export const modelCarError = {
+  model: "Fe",
+  year: 1963,
+  color: "re",
+  buyValue: 3500000,
+  seatsQty: 1,
+  doorsQty: 1
+}
+
 export const arrayOfMocks = [
   {
     _id: "4edd40c86762e0fb12000003",

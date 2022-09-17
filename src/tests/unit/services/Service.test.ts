@@ -3,7 +3,7 @@ import Sinon from "sinon"
 import { CarZodSchema } from "../../../interfaces/ICar"
 import CarsModel from "../../../models/CarsModel"
 import CarsService from "../../../services/CarsService"
-import { arrayOfMocks, modelCarMock, modelCarMockUpdate, modelCarMockUpdateWIthId, modelCarMockWithId } from "../../mocks/modelMock"
+import { arrayOfMocks, modelCarError, modelCarMock, modelCarMockUpdate, modelCarMockUpdateWIthId, modelCarMockWithId } from "../../mocks/modelMock"
 
 const carsModel = new CarsModel()
 const carsService = new CarsService(carsModel, CarZodSchema)
@@ -18,6 +18,13 @@ describe('Testando a camada service', () => {
 
     expect(item).to.be.equal(modelCarMockWithId)
   })
+  it('retorna um erro quando envia o objeto errado para criar', async () => {
+    try {
+      await carsService.create(modelCarError)
+    } catch (error) {
+      expect(error).to.be.instanceOf(Error)
+    }
+  })
   it('retorna um array de itens do banco', async () => {
     Sinon.stub(carsModel, 'read').resolves(arrayOfMocks)
     const item = await carsService.read()
@@ -29,6 +36,13 @@ describe('Testando a camada service', () => {
     const item = await carsService.readOne(modelCarMockWithId._id)
 
     expect(item).to.be.eql(modelCarMockWithId)
+  })
+  it('retorna um erro se enviar um array errado', async () => {
+    try {
+      await carsService.readOne('4edd40c86762e0fb120000')
+    } catch (error) {
+      expect(error).to.be.instanceOf(Error)
+    }
   })
   it('atualiza um item especifico', async () => {
     Sinon.stub(carsModel, 'update').resolves(modelCarMockUpdateWIthId)
